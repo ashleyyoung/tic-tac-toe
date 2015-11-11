@@ -18,6 +18,6 @@ Don't post the save move twice; you'll have to try again.
 
 Stay in range: 0, 1, and 2 are valid x and y coordinates.
 
-Get your move history from ```http://localhost:8080/matchHistory``` as well.
+Get your move history from ```http://localhost:8080/matchHistory```.
 
 More to come!
