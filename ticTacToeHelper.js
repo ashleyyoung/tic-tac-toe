@@ -8,7 +8,7 @@ exports.checkForHorizontalWin = function (xCoord, yCoord, gameGrid){
 	var xCount = 0
 	var yCount = 0
 	var win = 0
-	
+
 	if(gameGrid[xCoord][yCoord] === 'x'){
 		xCount++
 		if(gameGrid[xCoord + 1][yCoord] === 'x' || ((xCoord - 1 > -1) && gameGrid[xCoord - 1][yCoord] === 'x')) {
@@ -96,3 +96,24 @@ exports.checkForWin = function (gameGrid){
 
 	return win
 }
+
+/*
+*	Check to see if any positions contain '0'. If they do,
+* 	the grid is not full
+*/
+exports.gameGridIsFull = function (gameGrid){
+
+	for(var xCoord = 0; xCoord < 3; xCoord++){
+		for(var yCoord = 0; yCoord <3 ; yCoord++){
+			if(gameGrid[xCoord][yCoord] === 0){
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
+
+
+
