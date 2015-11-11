@@ -5,8 +5,8 @@ var ticTacToeHelper = require('./ticTacToeHelper.js')
 
 var gameDataSchema  = Joi.object().keys({
     user: Joi.string().valid(['User1','User2','User3']).required(),
-    positionX: Joi.number().required(),
-    positionY: Joi.number().required()
+    positionX: Joi.number().valid([0,1,2]).required(),
+    positionY: Joi.number().valid([0,1,2]).required()
 })  
 
 var ip     = '127.0.0.1';
@@ -17,7 +17,6 @@ var server = restify.createServer({
 
 server.listen(port ,ip, function(){
     console.log('%s listening at %s ', server.name , server.url);
-    // res.send('Waiting for opponent')
 });
 
 server.use(restify.queryParser());
@@ -27,6 +26,7 @@ server.use(restify.CORS());
 var connection = '127.0.0.1:27017/tictactoe';
 var db = mongojs(connection, ['tictactoe']);
 var games = db.collection("games"); 
+
 
 
 var gameGrid = [[0,0,0],
@@ -39,9 +39,7 @@ var clearGrid = [[0,0,0],
 
 var turnCount = 0
 
-function postUserMove(req , res , next){
-
-    // console.log("REQ: ", req.params)
+function postUserMove(req, res, next){
 
     var move = {};
     Joi.validate(req.params, gameDataSchema, function (err, validation){
@@ -49,21 +47,21 @@ function postUserMove(req , res , next){
         move = validation
     })
 
-    if( gameGrid[move.positionX][move.positionY] === 'x' ){
+    if( gameGrid[move.positionX][move.positionY] !== 0 ){
         var occupied = 'Position (' + move.positionX + ',' + move.positionY + ') is occupied. Please choose another move.'
         res.send(occupied);
         return next()
     }
 
-    gameGrid[move.positionX][move.positionY] = (req.params.user === 'User1') ? 'x' : 'o'
+    var positionValue = (req.params.user === 'User1') ? 'x' : 'o'
+    gameGrid[move.positionX][move.positionY] = positionValue
+
     move.time = new Date();
     move.currentGameGrid = gameGrid
     move.turnNumber = ++turnCount
 
     var winCheckResult = ticTacToeHelper.checkForWin(gameGrid)
-    
-    // console.log("MOVE: ", move)
-  
+      
     games.insert(move, function(err, result) {
 
         if (err) {
@@ -91,22 +89,31 @@ function postUserMove(req , res , next){
     });
 }
 
-function findAllMoves(req, res , next){
+function findAllMoves(req, res, next){
 
     games.find().sort({postedOn : -1} , function(err , matchHistory){
         
         if(err) return next(err)
      
         res.send(matchHistory);
-        return next(null, matchHistory)
+    
+        return next()
     })
+}
+
+function waiting(req, res, next){
+     
+    res.send('Waiting for opponent');
+    
+    return next()
+
 }
 
 
 var path = '/'
 var matchHistoryPath = '/matchHistory'
 server.get({path : matchHistoryPath , version : '0.0.1'} , findAllMoves)
-// server.get({path : path , version : '0.0.1'} , currentState)
+server.get({path : path , version : '0.0.1'} , waiting)
 server.post({path : path, version: '0.0.1'} , postUserMove)
 
 
