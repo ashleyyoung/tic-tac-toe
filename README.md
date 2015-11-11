@@ -4,6 +4,8 @@ To play this game, you'll need the following modules:
 
 restify, mongojs, joi
 
+Launch the code with ```node tictactoeExercise.js```
+
 Post your moves to ```http://localhost:8080/```
 
 Use the following request format to post your moves:
