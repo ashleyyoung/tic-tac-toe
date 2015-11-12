@@ -26,7 +26,7 @@ More to come!
 
 To do: 
 
-(1) Modify db entries to have a single object added per game with move history
+(1) Modify db entries to have a single object added per game with move history. POST the new match and then PUT to the matchHistory object.
 ex:
 ```
 {
